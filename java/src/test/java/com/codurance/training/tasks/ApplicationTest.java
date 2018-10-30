@@ -6,11 +6,14 @@ import java.io.InputStreamReader;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintWriter;
+import java.util.stream.Stream;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import static java.lang.System.lineSeparator;
+import static java.lang.System.out;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -31,6 +34,7 @@ public final class ApplicationTest {
         taskList = new TaskList(in, out);
         applicationThread = new Thread(taskList);
     }
+
 
     @Before public void
     start_the_application() {
@@ -101,13 +105,29 @@ public final class ApplicationTest {
     }
 
     @Test
-    public void should_add_deadline_to_each_task() {
-        //tasklist.getBacklog()
+    public void should_add_deadline_to_each_task() throws IOException {
+
+        taskList.getBacklog()
+                .getProjects()
+                .stream()
+                .flatMap(ApplicationTest::getTasks)
+                .forEach(task -> execute("deadline "+task.getId()+ " 2018-11-11 20:30:00"));
+
     }
 
-    private void execute(String command) throws IOException {
-        read(PROMPT);
-        write(command);
+
+    private static Stream<? extends Task> getTasks(Project project) {
+        return project.getTasks().stream();
+    }
+
+    private void execute(String command) {
+        try {
+            read(PROMPT);
+            write(command);
+        }catch (IOException ie){
+            out.printf("there is an error: " + ie.getMessage());
+        }
+
     }
 
     private void read(String expectedOutput) throws IOException {

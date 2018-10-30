@@ -4,11 +4,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 public final class TaskList implements Runnable {
     private static final String QUIT = "quit";
+
+
 
     private final Backlog backlog = new Backlog();
     private final BufferedReader in;
@@ -42,6 +45,10 @@ public final class TaskList implements Runnable {
             }
             execute(command);
         }
+    }
+
+    public Backlog getBacklog() {
+        return backlog;
     }
 
     private void execute(String commandLine) {
