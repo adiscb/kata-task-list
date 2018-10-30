@@ -4,15 +4,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 public final class TaskList implements Runnable {
     private static final String QUIT = "quit";
 
-    private final Map<String, List<Task>> tasks = new LinkedHashMap<>();
+    private final Backlog backlog = new Backlog();
     private final BufferedReader in;
     private final PrintWriter out;
 
@@ -72,9 +70,9 @@ public final class TaskList implements Runnable {
     }
 
     private void show() {
-        for (Map.Entry<String, List<Task>> project : tasks.entrySet()) {
-            out.println(project.getKey());
-            for (Task task : project.getValue()) {
+        for (Project project : backlog.getProjects()) {
+            out.println(project.getName());
+            for (Task task : project.getTasks()) {
                 out.printf("    [%c] %d: %s%n", (task.isDone() ? 'x' : ' '), task.getId(), task.getDescription());
             }
             out.println();
@@ -93,11 +91,11 @@ public final class TaskList implements Runnable {
     }
 
     private void addProject(String name) {
-        tasks.put(name, new ArrayList<Task>());
+        backlog.add(new Project(name));
     }
 
     private void addTask(String project, String description) {
-        List<Task> projectTasks = tasks.get(project);
+        List<Task> projectTasks = backlog.get(project).getTasks();
         if (projectTasks == null) {
             out.printf("Could not find a project with the name \"%s\".", project);
             out.println();
@@ -116,8 +114,8 @@ public final class TaskList implements Runnable {
 
     private void setDone(String idString, boolean done) {
         int id = Integer.parseInt(idString);
-        for (Map.Entry<String, List<Task>> project : tasks.entrySet()) {
-            for (Task task : project.getValue()) {
+        for (Project project : backlog.getProjects()) {
+            for (Task task : project.getTasks()) {
                 if (task.getId() == id) {
                     task.setDone(done);
                     return;

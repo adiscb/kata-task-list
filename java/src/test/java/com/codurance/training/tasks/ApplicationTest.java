@@ -23,11 +23,12 @@ public final class ApplicationTest {
     private final BufferedReader outReader = new BufferedReader(new InputStreamReader(outStream));
 
     private Thread applicationThread;
+    private TaskList taskList;
 
     public ApplicationTest() throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(new PipedInputStream(inStream)));
         PrintWriter out = new PrintWriter(new PipedOutputStream(outStream), true);
-        TaskList taskList = new TaskList(in, out);
+        taskList = new TaskList(in, out);
         applicationThread = new Thread(taskList);
     }
 
@@ -97,6 +98,11 @@ public final class ApplicationTest {
         );
 
         execute("quit");
+    }
+
+    @Test
+    public void should_add_deadline_to_each_task() {
+        //tasklist.getBacklog()
     }
 
     private void execute(String command) throws IOException {
